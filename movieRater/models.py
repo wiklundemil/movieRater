@@ -1,11 +1,12 @@
 from django.db import models
 
+
 class Post(models.Model):
     """Model representing a post."""
     postId       = models.IntegerField(unique=True)
     postMetadata = models.CharField(max_length=300, help_text="Contain the data for the post.")
     postUserId   = models.ForeignKey('User', on_delete=models.RESTRICT, null=True)
-
+    postMovieId  = models.IntegerField(unique=True)
     def __int__(self):
         return self.postId
 
