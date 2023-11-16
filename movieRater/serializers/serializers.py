@@ -6,5 +6,4 @@ class userSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['userName', 'userSurname', 'userForename', 'userFavGenre']
 
-    #class userClassSerializer(serializers.HyperlinkedModelSerializer):
 
