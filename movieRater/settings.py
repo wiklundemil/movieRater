@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'movieRater',
+    #Down here is our added stuff (Not generated).
+ #   'movieRater.apps.ApiConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
