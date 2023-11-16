@@ -8,7 +8,7 @@ class Post(models.Model):
     postUserId   = models.ForeignKey('User', on_delete=models.RESTRICT, null=True)
     postMovieId  = models.IntegerField(unique=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-
+    slug = models.SlugField(max_length=255, unique=True, blank=False, null=True)
     def __int__(self):
         return self.postId
 
@@ -28,7 +28,7 @@ class User(models.Model):
     userName     = models.CharField(max_length=28)
     userSurname  = models.CharField(max_length=28)
     userForename = models.CharField(max_length=28)
-    userFavGenre = models.CharField(max_length=28)
+    userFavGenre = models.CharField(max_length=28, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     def __int__(self):
