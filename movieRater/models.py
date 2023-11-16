@@ -25,6 +25,7 @@ class User(models.Model):
     userName     = models.CharField(max_length=28)
     userSurname  = models.CharField(max_length=28)
     userForename = models.CharField(max_length=28)
+    userFavGenre = models.CharField(max_length=28)
 
     def __int__(self):
         return self.userId

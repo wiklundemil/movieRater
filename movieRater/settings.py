@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ldowf-(!xvnqyn)4m(xo*hh5r52if(n^-+^w^w8+_!nn2#e0=t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'rest_framework'
     'movieRater',
 ]
 
