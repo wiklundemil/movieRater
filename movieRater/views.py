@@ -9,12 +9,13 @@ import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from serializers import post_serializer
 from rest_framework import generics
 
 from .models import Post
 
 import requests
+from .serializers.serializers import PostSerializer
+
 
 @api_view(['GET', 'POST'])
 def apiV1(request):
@@ -28,8 +29,17 @@ def apiV1(request):
 
 class GetPostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
-    serializer_class = post_serializer
+    serializer_class = PostSerializer
 
+#Post methods
+@api_view(['POST'])
+def CreatePost(request):
+    serializer = PostSerializer(data = request.data)
+    if(serializer.is_valid()):
+        serializer.save()
+    return Response(serializer.data)
+
+#Movie methods
 @api_view(['GET'])
 def GetMovie(request, movie_id):
     url = f'https://api.themoviedb.org/3/movie/{movie_id}?language=en-Us'
@@ -74,3 +84,11 @@ def fetchDataFromTmdbTextSearch(query):
         return movies_info
     else:
         return f"Error: {response.status_code} - {response.text}"
+
+#rating methods
+def CreateRating(request):
+    serializer = PostSerializer(data = request.data)
+
+    if(serializer.is_valid()):
+        serializer.save()
+    return Response(serializer.data)
