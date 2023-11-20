@@ -8,13 +8,12 @@ import requests
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 from rest_framework import generics
 
-from .models import Post
+from .models import Post, User
 
 import requests
-from .serializers.serializers import PostSerializer
+from .serializers.serializers import PostSerializer, MovieSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -32,12 +31,38 @@ class GetPostList(generics.ListCreateAPIView):
     serializer_class = PostSerializer
 
 #Post methods
-@api_view(['POST'])
-def CreatePost(request):
-    serializer = PostSerializer(data = request.data)
-    if(serializer.is_valid()):
-        serializer.save()
-    return Response(serializer.data)
+class CreatePost(generics.CreateAPIView):
+    serializer_class = MovieSerializer
+    queryset = Post.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Extract data from the serializer
+        movie_id = serializer.validated_data['post_MovieId']
+        metadata = serializer.validated_data['post_Metadata']
+        user_id = serializer.validated_data['post_UserId']
+
+        # Check if the user exists
+        try:
+            user = User.objects.get(userId=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist'}, status=400)
+
+        # Create the Post instance
+        post_instance = Post.objects.create(
+            postMovieId=movie_id,
+            postMetadata=metadata,
+            postUserId=user
+            # You may need to set other fields as needed
+        )
+
+        # Return a response, you can customize this based on your needs
+        return Response({'success': 'Post created successfully'}, status=201)
+
+
+
 
 #Movie methods
 @api_view(['GET'])
