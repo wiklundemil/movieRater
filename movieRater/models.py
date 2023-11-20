@@ -5,7 +5,7 @@ class Post(models.Model):
     """Model representing a post."""
     postId       = models.IntegerField(unique=True)
     postMetadata = models.CharField(max_length=300, help_text="Contain the data for the post.")
-    postUserId   = models.ForeignKey('User', on_delete=models.RESTRICT, null=True)
+    #postUserId   = models.ForeignKey('User', on_delete=models.RESTRICT, null=True)
     postMovieId  = models.IntegerField(unique=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, blank=False, null=True)

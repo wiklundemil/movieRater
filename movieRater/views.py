@@ -62,11 +62,15 @@ def GetMovie(request, movie_id):
         return Response({"error": "Failed to retrieve movie details"}, status=response.status_code)
     return Response(api_urls)
 
-@api_view(['POST', 'GET'])
-def postMovie(request, query):
+
+@api_view(['GET'])
+def searchMovieKey(request):
+    query = request.query_params.get('query', '')
+    if not query:
+        return Response({'error': 'Missing query parameter'}, status=400)
+
     dataResponseFromTmdb = fetchDataFromTmdbTextSearch(query)
-    #return the data from TMDB
-    return Response({'movie ID': dataResponseFromTmdb})
+    return Response({'movie data for search': dataResponseFromTmdb})
 
 def fetchDataFromTmdbTextSearch(query):
     url = f"https://api.themoviedb.org/3/search/keyword?query={query}&page=1"
@@ -92,3 +96,15 @@ def CreateRating(request):
     if(serializer.is_valid()):
         serializer.save()
     return Response(serializer.data)
+
+@api_view(['GET'])
+def searchPost(request):
+    search_text = request.query_params.get('query', '')
+
+    if not search_text:
+        return Response({'error': 'Missing query parameter'}, status=400)
+
+    matching_posts = Post.objects.filter(postMetadata=search_text)
+    post_ids = [post.id for post in matching_posts]
+
+    return Response({'matching_post_ids': post_ids})
