@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework.authtoken',
+    ''
+
     'movieRater',
 
     #Down here is our added stuff (Not generated).

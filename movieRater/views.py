@@ -6,16 +6,67 @@ from django.http import HttpResponse
 #For tmdb
 import requests
 
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from .models import Post, User
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+
+from .models import Post
 
 import requests
-from .serializers.serializers import PostSerializer, MovieSerializer
+from .serializers.serializers import PostSerializer, MovieSerializer, UserSerializer
+#User views
 
+@api_view(['POST'])
+def login(request):
+    user = get_object_or_404(User, username=request.data['username'])
+    if not user.check_password(request.data['password']):
+        return Response({"detail": "Password is invalid."}, status=status.HTTP_404_NOT_FOUND)
+    token, created = Token.objects.get_or_create(user=user)
+    serializer = UserSerializer(instance=user)
+    return Response({"detail": token.key, "user": serializer.data})
 
+@api_view(['POST'])
+def signup(request):
+    serializer = UserSerializer(data = request.data)
+    if serializer.is_valid():
+        serializer.save()
+        user = User.objects.get(username=request.data['username'])
+        user.set_password(request.data['password'])
+        user.save()
+        token = Token.objects.create(user=user)
+        return Response({"token": token.key, "user": serializer.data})
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    try:
+        # Attempt to delete the user's token to effectively "log them out"
+        request.auth.delete()
+        return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+    except AttributeError:
+        # If request.auth is None, handle the error accordingly
+        return Response({"detail": "Authentication failed. Unable to log out."}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def validate(request):
+    return Response("Token validated for {}".format(request.user.username))
+
+#API
 @api_view(['GET', 'POST'])
 def apiV1(request):
     api_urls = {
@@ -42,19 +93,19 @@ class CreatePost(generics.CreateAPIView):
         # Extract data from the serializer
         movie_id = serializer.validated_data['post_MovieId']
         metadata = serializer.validated_data['post_Metadata']
-        user_id = serializer.validated_data['post_UserId']
+        user_id  = serializer.validated_data['post_UserId']
 
         # Check if the user exists
         try:
-            user = User.objects.get(userId=user_id)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=400)
 
         # Create the Post instance
         post_instance = Post.objects.create(
-            postMovieId=movie_id,
-            postMetadata=metadata,
-            postUserId=user
+            movie=movie_id,
+            metadata=metadata,
+            user=user
             # You may need to set other fields as needed
         )
 
