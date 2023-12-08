@@ -51,13 +51,12 @@ from rest_framework import status
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@permission_classes([SessionAuthentication])
 def logout(request):
     try:
-        # Attempt to delete the user's token to effectively "log them out"
         request.auth.delete()
         return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
     except AttributeError:
-        # If request.auth is None, handle the error accordingly
         return Response({"detail": "Authentication failed. Unable to log out."}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
@@ -91,7 +90,7 @@ class CreatePost(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         #take the data out of the request
         movie_query = request.data.get('moviequery', '')
-        metadata = request.data.get('post_Metadata', '')
+        metadata    = request.data.get('post_Metadata', '')
 
         if not request.user.is_authenticated:
             return Response({'error': 'You have to be logged in as a user to make a post.'})
@@ -101,12 +100,12 @@ class CreatePost(generics.CreateAPIView):
         if not movie_search_result:
             return Response({'error':'No movie found for the search input'})
 
-        movie_id = movie_search_result[0]['id']
-
+        movie_id    = movie_search_result[0]['id']
+        movie_title = movie_search_result[0]['title']
         # Create the Post instance
         post_instance = Post.objects.create(
             movie=movie_id,
-            metadata=metadata,
+            metadata= movie_title,
             user=request.user
             # You may need to set other fields as needed
         )
@@ -162,7 +161,7 @@ def fetchDataFromTmdbTextSearch(query):
     if response.status_code == 200:
         responseData = response.json()
         results = responseData.get('results', [])
-        movies_info = [{'id': movie['id'], 'name' : movie['name'] } for movie in results]
+        movies_info = [{'id': movie['id'], 'title' : movie['name'] } for movie in results]
         return movies_info
     else:
         return f"Error: {response.status_code} - {response.text}"

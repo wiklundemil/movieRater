@@ -5,14 +5,13 @@ from rest_framework import serializers
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id','username','password','email']
+        fields = ['id','username']
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
-   # movie_id    = serializers.CharField(max_length=100)
-   # movie_title = serializers.CharField(max_length=100)
+    user = UserSerializer()
     class Meta:
         model = Post
-        fields = ['postId', 'postMetadata'] #We can not use any fields connected to PK  because with HyperlinkedModelSerializer it brakes down because it dont want to show any PK
+        fields = ['id', 'metadata', 'user'] #We can not use any fields connected to PK  because with HyperlinkedModelSerializer it brakes down because it dont want to show any PK
 
 class MovieSerializer(serializers.HyperlinkedModelSerializer):
     # These are connected to the fields which is also make up the form in rest framework.
