@@ -16,21 +16,21 @@ from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-
 from .models import Post
-
 import requests
 from .serializers.serializers import PostSerializer, MovieSerializer, UserSerializer
+from rest_framework import generics
+
 #User views
 
 @api_view(['POST'])
 def login(request):
     user = get_object_or_404(User, username=request.data['username'])
     if not user.check_password(request.data['password']):
-        return Response({"detail": "Password is invalid."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"token": "Password is invalid."}, status=status.HTTP_404_NOT_FOUND)
     token, created = Token.objects.get_or_create(user=user)
     serializer = UserSerializer(instance=user)
-    return Response({"detail": token.key, "user": serializer.data})
+    return Response({"token": token.key, "user": serializer.data})
 
 @api_view(['POST'])
 def signup(request):
@@ -85,27 +85,29 @@ class GetPostList(generics.ListCreateAPIView):
 class CreatePost(generics.CreateAPIView):
     serializer_class = MovieSerializer
     queryset = Post.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        #take the data out of the request
+        movie_query = request.data.get('moviequery', '')
+        metadata = request.data.get('post_Metadata', '')
 
-        # Extract data from the serializer
-        movie_id = serializer.validated_data['post_MovieId']
-        metadata = serializer.validated_data['post_Metadata']
-        user_id  = serializer.validated_data['post_UserId']
+        if not request.user.is_authenticated:
+            return Response({'error': 'You have to be logged in as a user to make a post.'})
 
-        # Check if the user exists
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response({'error': 'User does not exist'}, status=400)
+        movie_search_result = fetchDataFromTmdbTextSearch(movie_query)
+
+        if not movie_search_result:
+            return Response({'error':'No movie found for the search input'})
+
+        movie_id = movie_search_result[0]['id']
 
         # Create the Post instance
         post_instance = Post.objects.create(
             movie=movie_id,
             metadata=metadata,
-            user=user
+            user=request.user
             # You may need to set other fields as needed
         )
 

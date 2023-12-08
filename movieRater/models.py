@@ -23,12 +23,6 @@ class Rating(models.Model):
         return self.ratingId
 
 
-
-class Role(models.Model):
-    role         = models.CharField(max_length=16)
-    User         = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-
     def __str__(self):
         return self.role
 

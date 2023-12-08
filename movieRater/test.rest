@@ -1,4 +1,30 @@
+
 POST http://127.0.0.1:8000/api/signup/
 Content-Type: application/json
 
 {"username": "Emil2", "password": "Emil2", "email":  "emil2wiklund@hotmail.com"}
+
+
+###
+POST http://127.0.0.1:8000/api/login/
+Content-Type: application/json
+
+{"username": "jacobTest", "password": "jacobTest"}
+
+
+###
+GET http://127.0.0.1:8000/api/validate/
+Content-Type: application/json
+Authorization: Token 4d1c23fa892adf6cfb2ee1da7d1cdc72a39a6e86
+
+###
+POST http://127.0.0.1:8000/api/logout/
+Content-Type: application/json
+Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
+
+###
+POST http://127.0.0.1:8000/api/createpost/
+Content-Type: application/json
+Authorization: Token 4d1c23fa892adf6cfb2ee1da7d1cdc72a39a6e86
+
+{"moviequery" : "fight club"}
