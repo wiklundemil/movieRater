@@ -8,7 +8,7 @@ class Post(models.Model):
     user         = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
     movie        = models.IntegerField(null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    slug         = models.SlugField(max_length=255, unique=True, blank=False, null=True)
+   # slug         = models.SlugField(max_length=255, unique=True, blank=False, null=True)
     def __int__(self):
         return self.pk
 
@@ -22,12 +22,6 @@ class Rating(models.Model):
 
     def __int__(self):
         return self.ratingId
-
-
-    def __str__(self):
-        return self.role
-
-
 
 
 

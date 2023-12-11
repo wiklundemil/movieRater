@@ -76,11 +76,18 @@ def apiV1(request):
     }
     return Response(api_urls)
 
-class GetPostList(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-
 #Post methods
+@api_view(['GET'])
+def searchPost(request):
+    search_text = request.query_params.get('query', '')
+
+    if not search_text:
+        return Response({'error': 'Missing query parameter'}, status=400)
+
+    matching_posts = Post.objects.filter(postMetadata=search_text)
+    post_ids = [post.id for post in matching_posts]
+
+    return Response({'matching_post_ids': post_ids})
 class CreatePost(generics.CreateAPIView):
     serializer_class = MovieSerializer
     queryset = Post.objects.all()
@@ -88,40 +95,68 @@ class CreatePost(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        #take the data out of the request
         movie_query = request.data.get('moviequery', '')
-        metadata    = request.data.get('post_Metadata', '')
-
+        #metadata    = request.data.get('post_Metadata', '')
+        print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         if not request.user.is_authenticated:
             return Response({'error': 'You have to be logged in as a user to make a post.'})
 
         movie_search_result = fetchDataFromTmdbTextSearch(movie_query)
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
         if not movie_search_result:
             return Response({'error':'No movie found for the search input'})
+            print("LLLLLLLLLLLLLLLLLLLL")
 
         movie_id    = movie_search_result[0]['id']
         movie_title = movie_search_result[0]['title']
-        # Create the Post instance
+
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFF")
+
         post_instance = Post.objects.create(
             movie=movie_id,
-            metadata= movie_title,
+            metadata=movie_title,
             user=request.user
-            # You may need to set other fields as needed
         )
 
-        # Return a response, you can customize this based on your needs
         return Response({'success': 'Post created successfully'}, status=201)
 
+class GetPostList(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
 
+
+from rest_framework.response import Response
+@api_view(['GET'])
+def UpdatePost(request, post_id, newmovieid):
+    postinstance = (Post.objects.get(id=post_id))
+    response_from_movie = fetchMovieDataById(newmovieid)
+
+    if not response_from_movie:
+        return Response({'error': 'No movie found for the given id.'})
+    else:
+        if (request.user == postinstance.user):
+            postinstance.movie = newmovieid
+            postinstance.metadata = response_from_movie['title']
+            postinstance.save()
+        else:
+            return Response({'error': 'You are not the author for this post.'})
+    return Response(response_from_movie)
+
+@api_view(['GET'])
+def DeletePost(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.user == post.user:
+        post.delete()
+        msg = 'Post ' + str(post_id) + ' deleted.'
+        return Response({'success': msg})
+
+    return Response({'error': 'You are not the author for this post.'})
 
 
 #Movie methods
-@api_view(['GET'])
-def GetMovie(request, movie_id):
+def fetchMovieDataById(movie_id):
     url = f'https://api.themoviedb.org/3/movie/{movie_id}?language=en-Us'
-
-   # url = "https://api.themoviedb.org/3/movie/872585?language=en-US"
 
     headers = {
         "accept": "application/json",
@@ -130,15 +165,12 @@ def GetMovie(request, movie_id):
 
     response = requests.get(url, headers=headers)
 
-    # Check if the request was successful (status code 200)
     if response.status_code == 200:
-        data = response.json()  # Parse the JSON response
-        return Response(data)
+        responseData = response.json()
+        return {'id': responseData['id'], 'title': responseData['title']}
     else:
-        # If the request was not successful, return an error response
-        return Response({"error": "Failed to retrieve movie details"}, status=response.status_code)
-    return Response(api_urls)
-
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
 
 @api_view(['GET'])
 def searchMovieKey(request):
@@ -154,17 +186,16 @@ def fetchDataFromTmdbTextSearch(query):
     #header containing jacomoel key
     headers = {
         "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OTIwZTEyY2ExOWViMzBjMDRmMWE0ZTc2ZWVjZWQ5YSIsInN1YiI6IjY1NGRmYTAyMjkzODM1NDNlZjUwMDE3MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pH2bokeD4x33NfsKJaejV7HH__Y1yurQZ8QD4zPeN2Y"
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OTIwZTEyY2ExOWViMzBjMDRmMWE0ZTc2ZWVjZWQ5YSIsInN1YiI6IjY1NGRmYTAyMjkzODM1NDNlZjUwMDE3MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pH2bokeD4x33NfsKJaejV7HH__Y1yurQZ8QD4zPeN2Y"
     }
-    # make a response
     response = requests.get(url, headers=headers)
-    if response.status_code == 200:
+
+    if response.ok:
         responseData = response.json()
-        results = responseData.get('results', [])
-        movies_info = [{'id': movie['id'], 'title' : movie['name'] } for movie in results]
-        return movies_info
+        return {'id': responseData['id'], 'title': responseData['title']}
     else:
-        return f"Error: {response.status_code} - {response.text}"
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
 
 #rating methods
 def CreateRating(request):
@@ -174,14 +205,3 @@ def CreateRating(request):
         serializer.save()
     return Response(serializer.data)
 
-@api_view(['GET'])
-def searchPost(request):
-    search_text = request.query_params.get('query', '')
-
-    if not search_text:
-        return Response({'error': 'Missing query parameter'}, status=400)
-
-    matching_posts = Post.objects.filter(postMetadata=search_text)
-    post_ids = [post.id for post in matching_posts]
-
-    return Response({'matching_post_ids': post_ids})
