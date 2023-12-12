@@ -9,9 +9,9 @@ from rest_framework.decorators import authentication_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from .models import Post, Rating
+from .models import Post
 import requests
-from .serializers.serializers import PostSerializer, MovieSerializer, UserSerializer, RatingSerializer
+from .serializers.serializers import PostSerializer, MovieSerializer, UserSerializer
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -151,7 +151,6 @@ def DeletePost(request, post_id):
 #Movie methods
 def fetchMovieDataById(movie_id):
     url = f'https://api.themoviedb.org/3/movie/{movie_id}?language=en-Us'
-
     headers = {
         "accept": "application/json",
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3NmI4NGFkODYyNDk4MTk5Y2Q2OTVjMGY1NGVmOWY0MSIsInN1YiI6IjY1NGRmOTRlMjg2NmZhMTA4ZGM0NmExMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0t-keSrINdGSK_FTZNHY6VYDvHkRJWkYsa9o4u10weE"
@@ -191,30 +190,6 @@ def fetchDataFromTmdbTextSearch(query):
         print(f"Error: {response.status_code} - {response.text}")
         return None
 
-#rating methods
-
-@api_view(['GET'])
-def createRating(request):
-    postId = request.data.get('postId', '')
-    ratingInput = request.data.get('rating', '')
-
-
-    if not (request.post == postId):
-        serializer = RatingSerializer(data={'rating': ratingInput})
-        if serializer.is_valid():
-            Rating.objects.create(
-                rating=serializer.validated_data['rating'],
-                post=postId  # FK to the post
-            )
-            return Response({'success': 'Rating created successfully'}, status=201)
-        else:
-            return Response({'error': serializer.errors}, status=400)
-    else:
-        postInstance = Post.objets.get(Id = postId)
-        postInstance.rating = ratingInput
-        return Response ({'success': 'Rating successfully updated'})
-
-
 @api_view(['GET'])
 def searchPost(request):
     search_text = request.query_params.get('query', '')
@@ -226,3 +201,32 @@ def searchPost(request):
     post_ids = [post.id for post in matching_posts]
 
     return Response({'matching_post_ids': post_ids})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@permission_classes([SessionAuthentication])
+def uppvote(request, post_id, user_id):
+    userId = request.user.id
+    post = get_object_or_404(Post, pk=post_id)
+    # Check if the user has upvoted the post
+    has_upvoted = post.uppvotes.filter(pk=user_id).exists()
+    if has_upvoted:
+        post.uppvotes.remove(userId)
+        return Response({'detail' : 'Upp vote has been cleared, a new vote can be cast'})
+    else:
+        post.uppvotes.add(userId)
+        return Response({'details' : 'Upp vote successful'})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@permission_classes([SessionAuthentication])
+def downvote(request, post_id, user_id):
+    userId = request.user.id
+    post = get_object_or_404(Post, pk = post_id)
+    has_downvoted = post.downvotes.filter(pk=user_id).exists()
+    if has_downvoted:
+        post.downvotes.remove(userId)
+        return Response({'detail' : 'Down vote has been cleared, a new vote can be cast'})
+    else:
+        post.downvotes.add(userId)
+        return Response({'detail' : 'Down vote successful'})

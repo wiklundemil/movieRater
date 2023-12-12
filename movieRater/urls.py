@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/login/',    views.login, name='login'),
     path('api/validate/', views.validate, name='validate_token'),
 
-    path('api/rate/', views.createRating, name='rate'),
+    path('api/post/uppvote', views.createRating, name='rate'),
+    path('api/post/downvote', views.createRating, name='rate'),
 
 ]

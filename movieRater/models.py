@@ -6,20 +6,22 @@ class Post(models.Model):
     #postId       = models.AutoField(unique=True)
     metadata     = models.CharField(max_length=300, help_text="Contain the data for the post.")
     user         = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
+    uppvotes     = models.ManyToManyField(User, related_name='uppvotedposts')
+    downvotes    = models.ManyToManyField(User, related_name='downvotedposts')
     movie        = models.IntegerField(null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
    # slug         = models.SlugField(max_length=255, unique=True, blank=False, null=True)
     def __int__(self):
         return self.pk
 
-class Rating(models.Model):
-    id     = models.IntegerField(primary_key=True, unique=True)
-    rating = models.IntegerField(help_text="Value from 0-5")
-    comment      = models.CharField(max_length=300)
-    post         = models.ForeignKey('Post', on_delete=models.RESTRICT, null=True) #Foregin key used because a rating can have one Post but a Post may have many ratings.
+#class Rating(models.Model):
+    #id     = models.IntegerField(primary_key=True, unique=True)
+    #rating = models.IntegerField(help_text="Value from 0-5")
+    #comment      = models.CharField(max_length=300)
+    #post         = models.ForeignKey('Post', on_delete=models.RESTRICT, null=True) #Foregin key used because a rating can have one Post but a Post may have many ratings.
     #ratingUserId, this can be accessed via Post because post have a FK user
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    #date_created = models.DateTimeField(auto_now_add=True, null=True)
 
-    def __int__(self):
-        return self.ratingId
+    #def __int__(self):
+        #return self.ratingId
 

@@ -1,4 +1,4 @@
-from ..models import Post, Rating
+from ..models import Post
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -23,12 +23,12 @@ class MovieSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['post_MovieId', 'post_Metadata', 'post_UserId']
 
 
-class RatingSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.IntegerField()
-    rating = serializers.IntegerField()
-
-    class Meta:
-        model = Rating
-        fields = ['id', 'rating']
+# class RatingSerializer(serializers.HyperlinkedModelSerializer):
+#     id = serializers.IntegerField()
+#     rating = serializers.IntegerField()
+#
+#     class Meta:
+#         model = Rating
+#         fields = ['id', 'rating']
 
 
