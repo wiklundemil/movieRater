@@ -4,22 +4,19 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 #For tmdb
-import requests
-
-from rest_framework import generics
 from rest_framework.authtoken.models import Token
-from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import authentication_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from .models import Post
+from .models import Post, Rating
 import requests
-from .serializers.serializers import PostSerializer, MovieSerializer, UserSerializer
+from .serializers.serializers import PostSerializer, MovieSerializer, UserSerializer, RatingSerializer
 from rest_framework import generics
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 #User views
 
@@ -44,10 +41,7 @@ def signup(request):
         return Response({"token": token.key, "user": serializer.data})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -168,12 +162,30 @@ def fetchDataFromTmdbTextSearch(query):
         return f"Error: {response.status_code} - {response.text}"
 
 #rating methods
-def CreateRating(request):
-    serializer = PostSerializer(data = request.data)
 
-    if(serializer.is_valid()):
-        serializer.save()
-    return Response(serializer.data)
+@api_view(['GET'])
+def createRating(request):
+    postId = request.data.get('postId', '')
+    ratingInput = request.data.get('rating', '')
+
+
+    if not (request.post == postId):
+        serializer = RatingSerializer(data={'rating': ratingInput})
+        if serializer.is_valid():
+            Rating.objects.create(
+                rating=serializer.validated_data['rating'],
+                post=postId  # FK to the post
+            )
+            return Response({'success': 'Rating created successfully'}, status=201)
+        else:
+            return Response({'error': serializer.errors}, status=400)
+    else:
+        postInstance = Post.objets.get(Id = postId)
+        postInstance.rating = ratingInput
+        return Response ({'success': 'Rating successfully updated'})
+
+
+
 
 @api_view(['GET'])
 def searchPost(request):
@@ -182,7 +194,8 @@ def searchPost(request):
     if not search_text:
         return Response({'error': 'Missing query parameter'}, status=400)
 
-    matching_posts = Post.objects.filter(postMetadata=search_text)
+    matching_posts = Post.objects.filter(metadata=search_text)
     post_ids = [post.id for post in matching_posts]
 
     return Response({'matching_post_ids': post_ids})
+

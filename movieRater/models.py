@@ -23,8 +23,6 @@ class Rating(models.Model):
         return self.ratingId
 
 
-    def __str__(self):
-        return self.role
 
 
 
