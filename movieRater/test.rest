@@ -9,22 +9,30 @@ Content-Type: application/json
 POST http://127.0.0.1:8000/api/login/
 Content-Type: application/json
 
-{"username": "admin", "password": "admin"}
+{"username": "jacobTest", "password": "jacobTest"}
 
 
 ###
 GET http://127.0.0.1:8000/api/validate/
 Content-Type: application/json
-Authorization: Token 9e327285b1763549b6b97489350c5f2618eaea2f
+Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
 
 ###
 POST http://127.0.0.1:8000/api/logout/
 Content-Type: application/json
-Authorization: Token 9e327285b1763549b6b97489350c5f2618eaea2f
+Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
 
 ###
 POST http://127.0.0.1:8000/api/createpost/
 Content-Type: application/json
-Authorization: Token 9e327285b1763549b6b97489350c5f2618eaea2f
+Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
 
 {"moviequery" : "Black Adam"}
+
+
+###
+POST http://127.0.0.1:8000/api/post/uppvote/1/10
+Content-Type: application/json
+Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
+
+{}
