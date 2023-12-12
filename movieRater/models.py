@@ -23,5 +23,3 @@ class Rating(models.Model):
     def __int__(self):
         return self.ratingId
 
-
-
