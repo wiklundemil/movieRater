@@ -45,7 +45,7 @@ def signup(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@permission_classes([SessionAuthentication])
+@authentication_classes([TokenAuthentication])
 def logout(request):
     try:
         request.auth.delete()
