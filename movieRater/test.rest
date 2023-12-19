@@ -15,16 +15,16 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8000/api/validate/
 Content-Type: application/json
-Authorization: Token 9e327285b1763549b6b97489350c5f2618eaea2f
+Authorization: Token 0f00c57040b8c0d76a03416b6ff178defdecbce2
 
 ###
 POST http://127.0.0.1:8000/api/logout/
 Content-Type: application/json
-Authorization: Token 9e327285b1763549b6b97489350c5f2618eaea2f
+Authorization: Token 0f00c57040b8c0d76a03416b6ff178defdecbce2
 
 ###
 POST http://127.0.0.1:8000/api/createpost/
 Content-Type: application/json
-Authorization: Token 9e327285b1763549b6b97489350c5f2618eaea2f
+Authorization: Token 0f00c57040b8c0d76a03416b6ff178defdecbce2
 
-{"moviequery" : "Black Adam"}
+{"moviequery" : "Fight Club"}
