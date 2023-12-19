@@ -14,14 +14,4 @@ class Post(models.Model):
     def __int__(self):
         return self.pk
 
-#class Rating(models.Model):
-    #id     = models.IntegerField(primary_key=True, unique=True)
-    #rating = models.IntegerField(help_text="Value from 0-5")
-    #comment      = models.CharField(max_length=300)
-    #post         = models.ForeignKey('Post', on_delete=models.RESTRICT, null=True) #Foregin key used because a rating can have one Post but a Post may have many ratings.
-    #ratingUserId, this can be accessed via Post because post have a FK user
-    #date_created = models.DateTimeField(auto_now_add=True, null=True)
-
-    #def __int__(self):
-        #return self.ratingId
 

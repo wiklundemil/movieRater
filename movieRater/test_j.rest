@@ -28,10 +28,3 @@ Content-Type: application/json
 Authorization: Token 0f00c57040b8c0d76a03416b6ff178defdecbce2
 
 {"moviequery" : "Fight Club"}
-
-###
-POST http://127.0.0.1:8000/api/rate/
-Content-Type: application/json
-Authorization: Token 0f00c57040b8c0d76a03416b6ff178defdecbce2
-
-{"postId" : 26, "rating": 4}

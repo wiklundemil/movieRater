@@ -82,6 +82,8 @@ def searchPost(request):
     post_ids = [post.id for post in matching_posts]
 
     return Response({'matching_post_ids': post_ids})
+
+#When creating a post this has to be done via postman
 class CreatePost(generics.CreateAPIView):
     serializer_class = MovieSerializer
     queryset = Post.objects.all()
@@ -90,29 +92,24 @@ class CreatePost(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         movie_query = request.data.get('moviequery', '')
-        #metadata    = request.data.get('post_Metadata', '')
-        print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+
         if not request.user.is_authenticated:
             return Response({'error': 'You have to be logged in as a user to make a post.'})
 
         movie_search_result = fetchDataFromTmdbTextSearch(movie_query)
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
         if not movie_search_result:
             return Response({'error':'No movie found for the search input'})
-            print("LLLLLLLLLLLLLLLLLLLL")
 
         movie_id    = movie_search_result[0]['id']
         movie_title = movie_search_result[0]['title']
-
-        print("FFFFFFFFFFFFFFFFFFFFFFFFFFF")
 
         post_instance = Post.objects.create(
             movie=movie_id,
             metadata=movie_title,
             user=request.user
         )
-
+        SendEmailUpdate(request, 'MOVIEEE TITLLLEEE')
         return Response({'success': 'Post created successfully'}, status=201)
 
 class GetPostList(generics.ListCreateAPIView):
@@ -176,20 +173,22 @@ def searchMovieKey(request):
 
 def fetchDataFromTmdbTextSearch(query):
     url = f"https://api.themoviedb.org/3/search/keyword?query={query}&page=1"
-    #header containing jacomoel key
+
     headers = {
         "accept": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OTIwZTEyY2ExOWViMzBjMDRmMWE0ZTc2ZWVjZWQ5YSIsInN1YiI6IjY1NGRmYTAyMjkzODM1NDNlZjUwMDE3MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pH2bokeD4x33NfsKJaejV7HH__Y1yurQZ8QD4zPeN2Y"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OTIwZTEyY2ExOWViMzBjMDRmMWE0ZTc2ZWVjZWQ5YSIsInN1YiI6IjY1NGRmYTAyMjkzODM1NDNlZjUwMDE3MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pH2bokeD4x33NfsKJaejV7HH__Y1yurQZ8QD4zPeN2Y"
     }
+
     response = requests.get(url, headers=headers)
-
-    if response.ok:
+    if response.status_code == 200:
         responseData = response.json()
-        return {'id': responseData['id'], 'title': responseData['title']}
+        results = responseData.get('results', [])
+        movies_info = [{'id': movie['id'], 'title' : movie['name'] } for movie in results]
+        return movies_info
     else:
-        print(f"Error: {response.status_code} - {response.text}")
-        return None
+        return f"Error: {response.status_code} - {response.text}"
 
+#rating methods
 @api_view(['GET'])
 def searchPost(request):
     search_text = request.query_params.get('query', '')
@@ -201,6 +200,12 @@ def searchPost(request):
     post_ids = [post.id for post in matching_posts]
 
     return Response({'matching_post_ids': post_ids})
+
+#Mail methods
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -230,3 +235,20 @@ def downvote(request, post_id, user_id):
     else:
         post.downvotes.add(userId)
         return Response({'detail' : 'Down vote successful'})
+
+def SendEmailUpdate(request, title):
+    user = request.user.id
+    template = render_to_string('emailtemplate.html', {'username': request.user, 'title': title})
+
+    email = EmailMessage(
+        'MovieRater following',
+        template,
+        settings.EMAIL_HOST_USER,
+        [request.user.email],
+    )
+    email.fail_silently = True
+    email.send()
+
+    #raing = Rating.objects.get(id = user)
+    context = {'detail': user}
+    return Response({'sucess': 'Mail sent to, '+request.user.username+'!'})
