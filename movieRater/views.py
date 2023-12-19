@@ -57,6 +57,7 @@ def logout(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def validate(request):
+    print("Inloggat id :",request.user.id)
     return Response("Token validated for {}".format(request.user.username))
 
 #API
@@ -207,33 +208,34 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@permission_classes([SessionAuthentication])
-def uppvote(request, post_id, user_id):
-    userId = request.user.id
+@authentication_classes([TokenAuthentication])
+def upvote(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     # Check if the user has upvoted the post
-    has_upvoted = post.uppvotes.filter(pk=user_id).exists()
+    has_upvoted = request.user in post.uppvotes.all()
     if has_upvoted:
-        post.uppvotes.remove(userId)
+        post.uppvotes.remove(request.user)
         return Response({'detail' : 'Upp vote has been cleared, a new vote can be cast'})
     else:
-        post.uppvotes.add(userId)
+        post.uppvotes.add(request.user)
         return Response({'details' : 'Upp vote successful'})
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@permission_classes([SessionAuthentication])
-def downvote(request, post_id, user_id):
-    userId = request.user.id
+@authentication_classes([TokenAuthentication])
+
+def downvote(request, post_id):
     post = get_object_or_404(Post, pk = post_id)
-    has_downvoted = post.downvotes.filter(pk=user_id).exists()
+    has_downvoted = request.user in post.downvotes.all()
+
     if has_downvoted:
-        post.downvotes.remove(userId)
+        post.downvotes.remove(request.user)
         return Response({'detail' : 'Down vote has been cleared, a new vote can be cast'})
     else:
-        post.downvotes.add(userId)
+
+        post.downvotes.add(request.user)
         return Response({'detail' : 'Down vote successful'})
 
 def SendEmailUpdate(request, title):

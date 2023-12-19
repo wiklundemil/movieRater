@@ -9,7 +9,7 @@ Content-Type: application/json
 POST http://127.0.0.1:8000/api/login/
 Content-Type: application/json
 
-{"username": "admin", "password": "admin"}
+{"username": "Emil2", "password": "Emil2"}
 
 
 ###
@@ -27,4 +27,17 @@ POST http://127.0.0.1:8000/api/createpost/
 Content-Type: application/json
 Authorization: Token 0f00c57040b8c0d76a03416b6ff178defdecbce2
 
-{"moviequery" : "Fight Club"}
+{"moviequery" : "Lord"}
+
+###
+POST http://127.0.0.1:8000/api/post/upvote/28/
+Content-Type: application/json
+Authorization: Token daf248083d7d6f4ec07472d1ab8466b0d2ed8769
+
+{}
+###
+POST http://127.0.0.1:8000/api/post/downvote/28/
+Content-Type: application/json
+Authorization: Token daf248083d7d6f4ec07472d1ab8466b0d2ed8769
+
+{}
