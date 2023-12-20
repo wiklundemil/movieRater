@@ -16,7 +16,7 @@ Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
 ###
 POST http://127.0.0.1:8000/api/logout/
 Content-Type: application/json
-Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
+Authorization: Token 784c26b67686652b9aec700ba08d2bd5370fea39
 
 
 ###
@@ -26,6 +26,11 @@ Authorization: Token 784c26b67686652b9aec700ba08d2bd5370fea39
 
 {"moviequery" : "Moneyball"}
 
+###
+POST http://127.0.0.1:8000/api/signup/
+Content-Type: application/json
+
+{"username": "jacobVote", "password": "jacobVote", "email":  "jacobVote@gmail.com"}
 
 
 
