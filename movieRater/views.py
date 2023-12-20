@@ -173,7 +173,8 @@ def searchMovieKey(request):
     return Response({'movie data for search': dataResponseFromTmdb})
 
 def fetchDataFromTmdbTextSearch(query):
-    url = f"https://api.themoviedb.org/3/search/keyword?query={query}&page=1"
+
+    url = f"https://api.themoviedb.org/3/search/movie?query={query}&include_adult=true&language=en-US&page=1"
 
     headers = {
         "accept": "application/json",
@@ -184,7 +185,7 @@ def fetchDataFromTmdbTextSearch(query):
     if response.status_code == 200:
         responseData = response.json()
         results = responseData.get('results', [])
-        movies_info = [{'id': movie['id'], 'title' : movie['name'] } for movie in results]
+        movies_info = [{'id': movie['id'], 'title': movie['title']} for movie in results]
         return movies_info
     else:
         return f"Error: {response.status_code} - {response.text}"
@@ -208,35 +209,6 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@authentication_classes([TokenAuthentication])
-def upvote(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    # Check if the user has upvoted the post
-    has_upvoted = request.user in post.uppvotes.all()
-    if has_upvoted:
-        post.uppvotes.remove(request.user)
-        return Response({'detail' : 'Upp vote has been cleared, a new vote can be cast'})
-    else:
-        post.uppvotes.add(request.user)
-        return Response({'details' : 'Upp vote successful'})
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@authentication_classes([TokenAuthentication])
-
-def downvote(request, post_id):
-    post = get_object_or_404(Post, pk = post_id)
-    has_downvoted = request.user in post.downvotes.all()
-
-    if has_downvoted:
-        post.downvotes.remove(request.user)
-        return Response({'detail' : 'Down vote has been cleared, a new vote can be cast'})
-    else:
-
-        post.downvotes.add(request.user)
-        return Response({'detail' : 'Down vote successful'})
 
 def SendEmailUpdate(request, title):
     user = request.user.id
@@ -254,3 +226,34 @@ def SendEmailUpdate(request, title):
     #raing = Rating.objects.get(id = user)
     context = {'detail': user}
     return Response({'sucess': 'Mail sent to, '+request.user.username+'!'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def upvote(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    # Check if the user has upvoted the post
+    has_upvoted = request.user in post.uppvotes.all()
+    if has_upvoted:
+        post.uppvotes.remove(request.user)
+        return Response({'detail' : 'Upvote has been cleared, a new vote can be cast'})
+    else:
+        post.uppvotes.add(request.user)
+        return Response({'details' : 'Upvote successful'})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+
+def downvote(request, post_id):
+    post = get_object_or_404(Post, pk = post_id)
+    has_downvoted = request.user in post.downvotes.all()
+
+    if has_downvoted:
+        post.downvotes.remove(request.user)
+        return Response({'detail' : 'Down vote has been cleared, a new vote can be cast'})
+    else:
+
+        post.downvotes.add(request.user)
+        return Response({'detail' : 'Down vote successful'})
