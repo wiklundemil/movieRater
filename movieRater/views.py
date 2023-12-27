@@ -41,17 +41,20 @@ def signup(request):
         return Response({"token": token.key, "user": serializer.data}, status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def logout(request):
     try:
-        request.auth.delete()
+        # Get the user associated with the token
+        user = User.objects.get(id=request.user.id)
+        # Delete the token
+        Token.objects.filter(user=user).delete()
         return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
-    except AttributeError:
-        return Response({"detail": "Authentication failed. Unable to log out."}, status=status.HTTP_401_UNAUTHORIZED)
+    except User.DoesNotExist:
+        return Response({"detail": "User not found."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
