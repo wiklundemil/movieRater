@@ -18,7 +18,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-#User views
+#Oauth views
+from django.shortcuts import render, redirect
+def home(request):
+    return render(request, "home.html")
+
+def logout_oath(request):
+    logout(request)
+    return redirect("api/")
+
 
 @api_view(['POST'])
 def login(request):

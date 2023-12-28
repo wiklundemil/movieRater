@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
+SITE_ID = 2 #for oath
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,7 +41,24 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'movieRater',
+    'django.contrib.sites',#for oath
+    'allauth',#for oath
+    'allauth.account',#for oath
+    'allauth.socialaccount',#for oath
+    'allauth.socialaccount.providers.google',#for oath
 ]
+
+#for oath
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email"
+        ],
+        "AUTH_PARAMS": {"access_type": "online"}
+    }
+}
+###
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'movieRater.urls'
@@ -133,3 +152,10 @@ EMAIL_PORT = '2525'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
+#for oath
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
+                           "allauth.account.auth_backends.AuthenticationBackend")
+###
+
+LOGIN_REDIRECT_URL = "/" #for oath
+LOGOUT_REDIRECT = "/"    #for oath
