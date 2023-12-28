@@ -16,6 +16,11 @@ urlpatterns = [
     path('api/updatepost/id=<int:post_id>&newmovieid=<int:newmovieid>/', views.UpdatePost, name='update_post'),
     path('api/deletepost/id=<int:post_id>', views.DeletePost, name='delete_post'),
 
+    path('api/signup/', views.signup, name='signup'),
+    path('api/logout/', views.logout, name='logout'),
+    path('api/login/', views.login, name='login'),
+    path('api/validate/', views.validate, name='validate_token'),
+
     path('api/post/upvote/<int:post_id>/',   views.upvote, name='uppvote'),
     path('api/post/downvote/<int:post_id>/', views.downvote, name='downvote'),
 
