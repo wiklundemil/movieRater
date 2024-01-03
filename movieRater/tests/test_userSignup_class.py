@@ -43,8 +43,7 @@ class UserTokenTest(APITestCase):
     def test_token_user(self):
         data = {
             'username' : 'Tester1',
-            'password' : 'pwdTester1',
-            'email'    : 'Tester1@gmail.com'
+            'password' : 'pwdTester1'
         }
 
         login_response = self.client.post(self.login_url, data)

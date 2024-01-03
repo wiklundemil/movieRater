@@ -10,7 +10,7 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8000/api/validate/
 Content-Type: application/json
-Authorization: Token 43ed0ed28fe1ef1b021a4f2ed7c81e9ed0928bef
+Authorization: Token 918c384af75fbce33c690665b5cf06cd19c69cc9
 
 
 ###
