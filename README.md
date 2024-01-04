@@ -5,8 +5,7 @@ Within this project a user should be able to create a post for a specific movie 
 
 The list of aviable api's that one can try out are:
 
-127.0.0.1:8000/admin/ - Admin panel
-127.0.0.1:8000/api/ - API overview
+127.0.0.1:8000/admin/ - Admin panel127.0.0.1:8000/api/ - API overview
 127.0.0.1:8000/api/searchmovie/ - Search movies by text key
 127.0.0.1:8000/api/postlist/ - List of posts
 127.0.0.1:8000/api/createpost/ - Create a new post
@@ -22,3 +21,4 @@ The list of aviable api's that one can try out are:
 127.0.0.1:8000/ - Google login
 127.0.0.1:8000/logoutOath/ - Logout Oath
 127.0.0.1:8000/accounts/ - Allauth URLs
+
