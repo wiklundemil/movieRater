@@ -28,12 +28,12 @@ is about. Further there is a voting system (upvote/downvote) to promote posts.
 6. /api/deletepost/ <br/> Deletes one of your own posts.
 7. /api/post/upvote <br/> Upvote a certain post, negation included.
 8. /api/post/downvote <br/> Downvote a certain post, negation included.
-9. /api/ - API overview
-10. /api/searchmovie/ - Search movies by text key
-11. /api/postlist/ - List of posts
-12. /api/updatepost/id=<int:post_id>&newmovieid=<int:newmovieid>/ - Update a post
-13. /api/deletepost/id=<int:post_id> - Delete a post
-14. /api/validate/ - Validate token
-15. /home/ - Google login
-16. /logoutOath/ - Logout Oath
-17. /accounts/ - Allauth URLs
+9. /api/ <br/>API overview
+10. /api/searchmovie/ <br/> Search movies by text key
+11. /api/postlist/ <br/> List of posts
+12. /api/updatepost/id=<int:post_id>&newmovieid=<int:newmovieid>/ <br/> Update a post
+13. /api/deletepost/id=<int:post_id> Delete a post
+14. /api/validate/ <br/> Validate token
+15. /home/ <br/> Google login
+16. /logoutOath/ <br/> Logout Oath
+17. /accounts/ <br/> Allauth URLs
