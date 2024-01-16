@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/post/downvote/<int:post_id>/', views.downvote, name='downvote'),
 
     #Oath testing
-    path("", views.home),
-    path("logoutOath", views.logout_oath)
+    path("", views.home, name ='google_login'),
+    path("logoutOath", views.logout_oath ),
+    path("accounts/", include("allauth.urls")),
+
 ]

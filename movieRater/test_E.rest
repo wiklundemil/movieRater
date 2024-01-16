@@ -2,7 +2,7 @@
 POST http://127.0.0.1:8000/api/signup/
 Content-Type: application/json
 
-{"username": "Emil2", "password": "Emil2", "email":  "emil2wiklund@hotmail.com"}
+{"username": "Emil3", "password": "Emil3", "email":  "emil3wiklund@hotmail.com"}
 
 
 ###
@@ -15,30 +15,30 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8000/api/validate/
 Content-Type: application/json
-Authorization: Token 74ec776fb97547dab7abd4b6f6d66ba3f2c758eb
+Authorization: Token dddacc98f6e944326e1554ca078382f8eb54c33b
 
 ###
 POST http://127.0.0.1:8000/api/logout/
 Content-Type: application/json
-Authorization: Token 74ec776fb97547dab7abd4b6f6d66ba3f2c758eb
+Authorization: Token dddacc98f6e944326e1554ca078382f8eb54c33b
 
 ###
 POST http://127.0.0.1:8000/api/createpost/
 Content-Type: application/json
-Authorization: Token 74ec776fb97547dab7abd4b6f6d66ba3f2c758eb
+Authorization: Token 83f28346dd09b3e8fdc57c19ef09a5ea645c9462
 
 {"moviequery" : "Lord"}
 
 ###
-POST http://127.0.0.1:8000/api/post/upvote/28/
+POST http://127.0.0.1:8000/api/post/upvote/32/
 Content-Type: application/json
-Authorization: Token 74ec776fb97547dab7abd4b6f6d66ba3f2c758eb
+Authorization: Token dddacc98f6e944326e1554ca078382f8eb54c33b
 
 {}
 ###
-POST http://127.0.0.1:8000/api/post/downvote/28/
+POST http://127.0.0.1:8000/api/post/downvote/31/
 Content-Type: application/json
-Authorization: Token 74ec776fb97547dab7abd4b6f6d66ba3f2c758eb
+Authorization: Token dddacc98f6e944326e1554ca078382f8eb54c33b
 
 {}
 
